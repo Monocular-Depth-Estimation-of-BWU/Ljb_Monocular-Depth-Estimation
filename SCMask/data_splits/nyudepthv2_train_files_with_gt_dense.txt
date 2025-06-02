@@ -36250,4 +36250,3 @@ foyer_0002/rgb_00048.jpg foyer_0002/sync_depth_00048.png foyer_0002/dense/sync_d
 foyer_0002/rgb_00049.jpg foyer_0002/sync_depth_00049.png foyer_0002/dense/sync_depth_dense_00049.png
 foyer_0002/rgb_00050.jpg foyer_0002/sync_depth_00050.png foyer_0002/dense/sync_depth_dense_00050.png
 foyer_0002/rgb_00051.jpg foyer_0002/sync_depth_00051.png foyer_0002/dense/sync_depth_dense_00051.png
-foyer_0002/rgb_00052.jpg foyer_0002/sync_depth_00052.png foyer_0002/dense/sync_depth_dense_00052.png

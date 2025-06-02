@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 from .swin_transformer import SwinTransformer
 from .newcrf_layers import NewCRF
-from .uper_crf_head import PSP
+from .uper_crf_head import PSP,DAPPM
 ########################################################################################################################
 
 
@@ -76,6 +76,11 @@ class NewCRFDepth(nn.Module):
         self.crf0 = NewCRF(input_dim=in_channels[0], embed_dim=crf_dims[0], window_size=win, v_dim=v_dims[0], num_heads=4)
 
         self.decoder = PSP(**decoder_cfg)
+        '''
+        planes = 64
+        spp_planes = 512
+        self.decoder = DAPPM(planes * 24, spp_planes, planes * 8)
+        '''
         self.disp_head1 = DispHead(input_dim=crf_dims[0])
 
         self.up_mode = 'bilinear'

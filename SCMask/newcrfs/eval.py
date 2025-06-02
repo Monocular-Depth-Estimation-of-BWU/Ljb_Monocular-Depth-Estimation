@@ -8,6 +8,9 @@ from tqdm import tqdm
 
 from utils import post_process_depth, flip_lr, compute_errors
 from networks.NewCRFDepth import NewCRFDepth
+from networks.NewCRFDepth_trapattion import TrapDepth
+import time
+from thop import profile  # 需要安装: pip install thop
 
 
 def convert_arg_line_to_args(arg_line):
@@ -59,6 +62,7 @@ elif args.dataset == 'kittipred':
 
 
 def eval(model, dataloader_eval, post_process=False):
+    
     eval_measures = torch.zeros(10).cuda()
     for _, eval_sample_batched in enumerate(tqdm(dataloader_eval.data)):
         with torch.no_grad():
@@ -129,7 +133,9 @@ def eval(model, dataloader_eval, post_process=False):
 def main_worker(args):
 
     # CRF model
-    model = NewCRFDepth(version=args.encoder, inv_depth=False, max_depth=args.max_depth, pretrained=None)
+    #model = NewCRFDepth(version=args.encoder, inv_depth=False, max_depth=args.max_depth, pretrained=None)
+    model = TrapDepth(version=args.encoder, inv_depth=False, max_depth=args.max_depth, pretrained=None)
+    
     model.train()
 
     num_params = sum([np.prod(p.size()) for p in model.parameters()])
@@ -140,7 +146,25 @@ def main_worker(args):
 
     model = torch.nn.DataParallel(model)
     model.cuda()
+    '''
+    # 创建与输入尺寸匹配的虚拟数据
+    input_shape = (1, 3, args.input_height, args.input_width)
+    dummy_input = torch.randn(*input_shape).cuda()
+    
+    # 处理DataParallel包装
+    model_to_profile = model.module if isinstance(model, torch.nn.DataParallel) else model
+    
+    # 确保在eval模式且无梯度
+    with torch.no_grad():
+        model_to_profile.eval()
+        flops, params = profile(model_to_profile, inputs=(dummy_input,), verbose=False)
+    
+    print(f"\n== FLOPs Analysis ==")
+    print(f"Input Shape: {input_shape}")
+    print(f"FLOPs per sample: {flops / 1e9:.2f} GFLOPs")
+    print(f"FLOPs for batch_size=32: {flops * 32 / 1e9:.2f} GFLOPs\n")
 
+    '''
     print("== Model Initialized")
 
     if args.checkpoint_path != '':
@@ -161,7 +185,7 @@ def main_worker(args):
     model.eval()
     with torch.no_grad():
         eval_measures = eval(model, dataloader_eval, post_process=True)
-
+    
 
 def main():
     torch.cuda.empty_cache()
