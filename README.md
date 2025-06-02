@@ -1,4 +1,4 @@
-## 这是一个居于NeW CRFs的优化模型
+## 这是一个基于NeW CRFs的优化模型
 
 整体分为三部分优化：<br>
 <blockquote>
